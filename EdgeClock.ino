@@ -85,12 +85,13 @@ void loop() {
   mqttLoop(now);          // Non-blocking MQTT connect/re-connect
   ArduinoOTA.handle();    // In case we want to upload a new sketch
 
-  
-  if (now - lastDisplayWrite > DISPLAY_INTERVAL) {
-
+  if (now - lastNTPSync > NTP_REFRESH_INTERVAL) {
     syncNTPTime(NTP_TIMEOUT);
+  }
+
+  // Having the display update very frequently allows for colour animations
+  if (now - lastDisplayWrite > DISPLAY_INTERVAL) {
     displayTime();
-    
   }
 
   

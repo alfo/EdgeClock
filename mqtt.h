@@ -55,6 +55,8 @@ boolean mqttConnect() {
     // This one is so we can set room-wide settings (like party mode etc.)
     mqttClient.subscribe(roomStateTopic);
 
+    Serial.println("=== MQTT connected ✓");
+
   } else {
 
     // Sadness and tears. Check your MQTT params in portal

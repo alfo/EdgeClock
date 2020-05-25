@@ -14,12 +14,12 @@
  *
  */
 
-const char* NTP_SERVER = "pool.ntp.org";
+const char* NTP_SERVER = "uk.pool.ntp.org";
 const char* TZ_INFO    = "GMT+0BST-1,M3.5.0/01:00:00,M10.5.0/02:00:00";  // enter your time zone (https://remotemonitoringsystems.ca/time-zone-abbreviations.php)
 
 unsigned long lastNTPSync;
 
-#define NTP_SYNC_INTERVAL 14400000    // Sync the NTP server every four hours
+#define NTP_REFRESH_INTERVAL 1000     // How many ms between updating the time
 #define NTP_TIMEOUT 60                // How many seconds to wait while trying to sync 
 
 // Called every so often and in setup
@@ -41,6 +41,10 @@ bool syncNTPTime(int sec) {
     // This code is called once every time we update the time
     // But called many times on initial sync, so:
     if (connectLoops > 0) {
+
+      if (connectLoops == 1) {
+        Serial.println("=== NTP connecting");
+      }
   
       // Call the display animation callback and loop every 100ms
       timeSyncDisplayCallback(500);
@@ -56,13 +60,10 @@ bool syncNTPTime(int sec) {
   // Check to see if we managed to sync the time in sec second
   if (localTime.tm_year <= (2019 - 1900)) return false;  // the NTP call was not successful
   
-//  Serial.print("\nTime sync complete: ");
-//  lastNTPSync = millis();
-//  char time_output[30];
-//  strftime(time_output, 30, "%a  %d-%m-%y %T", localtime(&now));
-//  Serial.println(time_output);
-//  Serial.println();
 
+  lastNTPSync = millis();
+
+  Serial.printf("\n%02d:%02d:%02d\n", localTime.tm_hour, localTime.tm_min, localTime.tm_sec);
   return true;
 }
 
@@ -71,8 +72,10 @@ void setupNTP() {
   configTime(0, 0, NTP_SERVER);
   setenv("TZ", TZ_INFO, 1);
 
-  if (!syncNTPTime(NTP_TIMEOUT)) {
-    Serial.println("Time not set");
+  if (syncNTPTime(NTP_TIMEOUT)) {
+    Serial.println("=== NTP connected ✓");
+  } else {
+    Serial.println("=== NTP FAIL ✗");
   }
   
 }
