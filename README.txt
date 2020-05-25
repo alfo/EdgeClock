@@ -1,0 +1,1 @@
+How to build a Giant Hidden Shelf Edge Clock - 3D Printable | Elegoo Arduino Nano | Smart Home | LED by DIY_Machines on Thingiverse: https://www.thingiverse.com/thing:4207524
