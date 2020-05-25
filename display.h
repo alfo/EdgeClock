@@ -40,21 +40,14 @@ void displayTime() {
 
   stripClock.clear(); //clear the clock face 
 
-  
-
   int firstMinuteDigit = localTime.tm_min / 10;
   int secondMinuteDigit = localTime.tm_min % 10;
 
   int firstHourDigit = localTime.tm_hour / 10;
   int secondHourDigit = localTime.tm_hour % 10;
 
-  //Serial.printf("Displaying time: %02d:%02d:%02d \n", localTime.tm_hour, localTime.tm_min, localTime.tm_sec);
-
-  Serial.print(firstHourDigit);
-  Serial.print(secondHourDigit);
-  Serial.print(":");
-  Serial.print(firstMinuteDigit);
-  Serial.println(secondMinuteDigit);
+  // Prove we've got it all under control
+  Serial.printf("Displaying time: %d%d:%d%d \n", firstHourDigit, secondHourDigit, firstMinuteDigit, secondMinuteDigit);
 
   lastDisplayWrite = millis();
   

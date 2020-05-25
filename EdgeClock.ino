@@ -86,7 +86,6 @@ void loop() {
   ArduinoOTA.handle();    // In case we want to upload a new sketch
 
   
-
   if (now - lastDisplayWrite > DISPLAY_INTERVAL) {
 
     syncNTPTime(NTP_TIMEOUT);

@@ -48,7 +48,7 @@ void startWiFiManagerWithParameters() {
   wm.setConnectTimeout(CONNECT_TIMEOUT);
   wm.setTimeout(AP_TIMEOUT);
   wm.setCleanConnect(true);
-  wm.setCountry("GB");
+  wm.setCountry("FR");
   
   // WiFiManager custom config
   WiFiManagerParameter custom_hostname("hostname", "Hostname", hostname, 24);
