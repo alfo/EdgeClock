@@ -22,43 +22,55 @@ unsigned long lastDisplayWrite;
  * 
  * Segments are as follows:
  * 
- *  -- A --
+ *  
+ *  -- 1 --
  * |       | 
- * B       C
+ * 2       0
  * |       |
- *   --D--
+ *   --3--
  * |       |
- * E       F
+ * 6       4
  * |       |
- *  -- G --
+ *  -- 5 --
  * 
  */
 
-void drawSegmentA(int offset, unsigned int digitStartHue, unsigned int digitEndHue, unsigned int digitStartSaturation, unsigned int digitEndSaturation) {
+void drawSegments(int offset, int segments[], unsigned int digitStartHue, unsigned int digitEndHue, unsigned int digitStartSaturation, unsigned int digitEndSaturation) {
 
-}
+  // Calculate how many segments we're drawing for this digit
+  int numberOfSegments = sizeof(segments) / sizeof(int);
 
-void drawSegmentB(int offset, unsigned int digitStartHue, unsigned int digitEndHue, unsigned int digitStartSaturation, unsigned int digitEndSaturation) {
+  // Loop over the segments that we need to draw
+  for (int segi = 0; segi < numberOfSegments; segi++) {
+
+    // Figure out which segment we're drawing this time
+    int segment = segments[segi];
   
-}
+    // Convert the offset of the digit to the offset of the segment
+    offset = offset + (segment * 9);
 
-void drawSegmentC(int offset, unsigned int digitStartHue, unsigned int digitEndHue, unsigned int digitStartSaturation, unsigned int digitEndSaturation) {
+    // If the segment is upwards instead of downwards, or right instead of left
+    // then the start and end are reversed
+    // The following are values out of (/9984), which is a 16-bit representation of
+    // how much variation there is between the start and end of each digit
+    unsigned int startGradientMap[9] = {7680, 4864, 0,    2048, 7936, 9472, 3328};
+    unsigned int endGradientMap[9] =   {5888, 256,  1536, 7168, 9984, 3840, 1792};
+
+    // Loop over each pixel to be lit
+    for (int i = 0; i < 9; i++) {
+
+      // Percentage of how far through the gradient we are on this pixel relative
+      // to the segment as a whole
+      float percentage = (float)map(i, 0, 8, startGradientMap[segment], endGradientMap[segment]) / (float)9984;
+
+      unsigned int pixelHue =        (percentage * (digitEndHue - digitStartHue)) + digitStartHue;
+      unsigned int pixelSaturation = (percentage * (digitEndSaturation - digitStartSaturation)) + digitStartSaturation;
   
-}
-
-void drawSegmentD(int offset, unsigned int digitStartHue, unsigned int digitEndHue, unsigned int digitStartSaturation, unsigned int digitEndSaturation) {
-  
-}
-
-void drawSegmentE(int offset, unsigned int digitStartHue, unsigned int digitEndHue, unsigned int digitStartSaturation, unsigned int digitEndSaturation) {
-  
-}
-
-void drawSegmentF(int offset, unsigned int digitStartHue, unsigned int digitEndHue, unsigned int digitStartSaturation, unsigned int digitEndSaturation) {
-  
-}
-
-void drawSegmentG(int offset, unsigned int digitStartHue, unsigned int digitEndHue, unsigned int digitStartSaturation, unsigned int digitEndSaturation) {
+      stripClock.setPixelColor(offset + i, stripClock.gamma32(stripClock.ColorHSV(pixelHue, pixelSaturation)));
+      
+    }
+    
+  }
   
 }
 
@@ -71,132 +83,82 @@ void drawSegmentG(int offset, unsigned int digitStartHue, unsigned int digitEndH
  * 
  */
 
-void digitZero(int offset, unsigned int digitStartHue, unsigned int digitEndHue, unsigned int digitStartSaturation, unsigned int digitEndSaturation) {
-  drawSegmentA(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentB(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentC(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentE(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentF(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentG(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-}
-
-void digitOne(int offset, unsigned int digitStartHue, unsigned int digitEndHue, unsigned int digitStartSaturation, unsigned int digitEndSaturation) {
-  drawSegmentC(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentF(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-}
-
-void digitTwo(int offset, unsigned int digitStartHue, unsigned int digitEndHue, unsigned int digitStartSaturation, unsigned int digitEndSaturation) {
-  drawSegmentA(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentC(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentD(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentE(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentG(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-}
-
-void digitThree(int offset, unsigned int digitStartHue, unsigned int digitEndHue, unsigned int digitStartSaturation, unsigned int digitEndSaturation) {
-  drawSegmentA(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentC(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentD(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentF(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentG(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-}
-
-void digitFour(int offset, unsigned int digitStartHue, unsigned int digitEndHue, unsigned int digitStartSaturation, unsigned int digitEndSaturation) {
-  drawSegmentB(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentC(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentD(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentF(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-}
-
-void digitFive(int offset, unsigned int digitStartHue, unsigned int digitEndHue, unsigned int digitStartSaturation, unsigned int digitEndSaturation) {
-  drawSegmentA(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentB(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentD(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentF(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentG(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-}
-
-void digitSix(int offset, unsigned int digitStartHue, unsigned int digitEndHue, unsigned int digitStartSaturation, unsigned int digitEndSaturation) {
-  drawSegmentA(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentB(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentD(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentE(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentF(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentG(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-}
-
-void digitSeven(int offset, unsigned int digitStartHue, unsigned int digitEndHue, unsigned int digitStartSaturation, unsigned int digitEndSaturation) {
-  drawSegmentA(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentC(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentF(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-}
-
-void digitEight(int offset, unsigned int digitStartHue, unsigned int digitEndHue, unsigned int digitStartSaturation, unsigned int digitEndSaturation) {
-  drawSegmentA(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentB(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentC(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentD(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentE(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentF(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentG(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-}
-
-void digitNine(int offset, unsigned int digitStartHue, unsigned int digitEndHue, unsigned int digitStartSaturation, unsigned int digitEndSaturation) {
-  drawSegmentA(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentB(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentC(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentD(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-  drawSegmentF(offset, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-}
-
 // Function to handle displaying each different digit
 void displayNumber(int valueToDisplay, int offsetBy, unsigned int digitStartHue, unsigned int digitEndHue, unsigned int digitStartSaturation, unsigned int digitEndSaturation) {
-  
-  switch (valueToDisplay) {
-    
-    case 0:
-    digitZero(offsetBy, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-      break;
-      
-    case 1:
-      digitOne(offsetBy, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-      break;
-      
-    case 2:
-    digitTwo(offsetBy, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-      break;
-      
-    case 3:
-    digitThree(offsetBy, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-      break;
-      
-    case 4:
-    digitFour(offsetBy, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-      break;
-      
-    case 5:
-    digitFive(offsetBy, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-      break;
-      
-    case 6:
-    digitSix(offsetBy, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-      break;
-      
-    case 7:
-    digitSeven(offsetBy, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-      break;
-      
-    case 8:
-    digitEight(offsetBy, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-      break;
-      
-    case 9:
-    digitNine(offsetBy, digitStartHue, digitEndHue, digitStartSaturation, digitEndSaturation);
-      break;
-      
-    default:
-     break;
+
+  // Don't let us ever try to draw incorrect digits
+  if (valueToDisplay < 0 || valueToDisplay > 9) {
+    // Do nothing
+  } else {
+
+    switch (valueToDisplay) {
+
+      // The curly braces allow us to declare the same segments[] variable multiple times, once in each case statement
+      // Unfortunately this means we also need the drawSegments() call to be in the variable scope, instead of once at the end
+      case 0: {
+        int segments[] = {0, 1, 2, 4, 5, 6};
+        drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
+        break;
+      }
+        
+      case 1: {
+        int segments[] = {0, 4};
+        drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
+        break;
+      }
+        
+      case 2: {
+        int segments[] = {1, 0, 3, 6, 5};
+        drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
+        break;
+      }
+        
+      case 3: {
+        int segments[] = {1, 0, 3, 4, 5};
+        drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
+        break;
+      }
+        
+      case 4: {
+        int segments[] = {2, 3, 0, 4};
+        drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
+        break;
+      }
+        
+      case 5: {
+        int segments[] = {1, 2, 3, 4, 5};
+        drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
+        break;
+      }
+        
+      case 6: {
+        int segments[] = {1, 2, 3, 4, 5, 6};
+        drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
+        break;
+      }
+        
+      case 7: {
+        int segments[] = {1, 0, 4};
+        drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
+        break;
+      }
+        
+      case 8: {
+        int segments[] = {0, 1, 2, 3, 4, 5, 6};
+        drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
+        break;
+      }
+        
+      case 9: {
+        int segments[] = {0, 1, 2, 3, 4, 5};
+        drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
+        break;
+      }
+       
+      }
+
   }
+
 }
 
 void setupDisplay() {
