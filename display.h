@@ -86,76 +86,71 @@ void drawSegments(int offset, int segments[], unsigned int digitStartHue, unsign
 // Function to handle displaying each different digit
 void displayNumber(int valueToDisplay, int offsetBy, unsigned int digitStartHue, unsigned int digitEndHue, unsigned int digitStartSaturation, unsigned int digitEndSaturation) {
 
-  // Don't let us ever try to draw incorrect digits
-  if (valueToDisplay < 0 || valueToDisplay > 9) {
-    // Do nothing
-  } else {
+  switch (valueToDisplay) {
 
-    switch (valueToDisplay) {
-
-      // The curly braces allow us to declare the same segments[] variable multiple times, once in each case statement
-      // Unfortunately this means we also need the drawSegments() call to be in the variable scope, instead of once at the end
-      case 0: {
-        int segments[] = {0, 1, 2, 4, 5, 6};
-        drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
-        break;
-      }
-        
-      case 1: {
-        int segments[] = {0, 4};
-        drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
-        break;
-      }
-        
-      case 2: {
-        int segments[] = {1, 0, 3, 6, 5};
-        drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
-        break;
-      }
-        
-      case 3: {
-        int segments[] = {1, 0, 3, 4, 5};
-        drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
-        break;
-      }
-        
-      case 4: {
-        int segments[] = {2, 3, 0, 4};
-        drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
-        break;
-      }
-        
-      case 5: {
-        int segments[] = {1, 2, 3, 4, 5};
-        drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
-        break;
-      }
-        
-      case 6: {
-        int segments[] = {1, 2, 3, 4, 5, 6};
-        drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
-        break;
-      }
-        
-      case 7: {
-        int segments[] = {1, 0, 4};
-        drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
-        break;
-      }
-        
-      case 8: {
-        int segments[] = {0, 1, 2, 3, 4, 5, 6};
-        drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
-        break;
-      }
-        
-      case 9: {
-        int segments[] = {0, 1, 2, 3, 4, 5};
-        drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
-        break;
-      }
-       
-      }
+    // The curly braces allow us to declare the same segments[] variable multiple times, once in each case statement
+    // Unfortunately this means we also need the drawSegments() call to be in the variable scope, instead of once at the end
+    case 0: {
+      int segments[] = {0, 1, 2, 4, 5, 6};
+      drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
+      break;
+    }
+      
+    case 1: {
+      int segments[] = {0, 4};
+      drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
+      break;
+    }
+      
+    case 2: {
+      int segments[] = {1, 0, 3, 6, 5};
+      drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
+      break;
+    }
+      
+    case 3: {
+      int segments[] = {1, 0, 3, 4, 5};
+      drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
+      break;
+    }
+      
+    case 4: {
+      int segments[] = {2, 3, 0, 4};
+      drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
+      break;
+    }
+      
+    case 5: {
+      int segments[] = {1, 2, 3, 4, 5};
+      drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
+      break;
+    }
+      
+    case 6: {
+      int segments[] = {1, 2, 3, 4, 5, 6};
+      drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
+      break;
+    }
+      
+    case 7: {
+      int segments[] = {1, 0, 4};
+      drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
+      break;
+    }
+      
+    case 8: {
+      int segments[] = {0, 1, 2, 3, 4, 5, 6};
+      drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
+      break;
+    }
+      
+    case 9: {
+      int segments[] = {0, 1, 2, 3, 4, 5};
+      drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
+      break;
+    }
+     
+    }
 
   }
 
