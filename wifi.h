@@ -47,8 +47,9 @@ void startWiFiManagerWithParameters() {
   wm.setSaveConfigCallback(saveConfigCallback);
   wm.setConnectTimeout(CONNECT_TIMEOUT);
   wm.setTimeout(AP_TIMEOUT);
-  wm.setCleanConnect(true);
+  //wm.setCleanConnect(true);
   wm.setCountry("FR");
+  wm.setEnableConfigPortal(false);
   
   // WiFiManager custom config
   WiFiManagerParameter custom_hostname("hostname", "Hostname", hostname, 24);
@@ -68,17 +69,31 @@ void startWiFiManagerWithParameters() {
     wm.resetSettings();
   #endif
 
+  delay(2000);
+
   // Run the routine to connect to the network
   if (!wm.autoConnect(hostname, "password")) {
 
-    // If we've hit the config portal timeout, then retstart
-    
-    Serial.println("%%% Failed to connect and hit timeout, restarting");
-    delay(100);
-    ESP.restart();
+    Serial.println("Retry autoConnect");
+    WiFi.disconnect();
+    WiFi.mode(WIFI_OFF);
+    wm.setEnableConfigPortal(true);
 
-    // Not sure if this line is necessary
-    delay(5000);
+    delay(2000);
+
+    if (!wm.autoConnect(hostname, "password")) {
+
+      // If we've hit the config portal timeout, then retstart
+      Serial.println("%%% Failed to connect and hit timeout, restarting");
+      delay(100);
+      ESP.restart();
+  
+      // Not sure if this line is necessary
+      delay(5000);
+      
+    }
+    
+    
   }
 
   // Keeping this line cos it's cute
