@@ -14,24 +14,45 @@ Adafruit_NeoPixel stripDownlighter(LEDDOWNLIGHT_COUNT, LEDDOWNLIGHT_PIN, NEO_GRB
 
 unsigned long lastDisplayWrite;
 
+// Called once in setup()
+// Does some basic prep for our strips
+void setupDisplay() {
+
+  stripClock.begin();                 // INITIALIZE NeoPixel stripClock object (REQUIRED)
+  stripClock.show();                  // Turn OFF all pixels ASAP
+  stripClock.setBrightness(100);      // Set inital BRIGHTNESS (max = 255)
+
+  stripDownlighter.begin();           // INITIALIZE NeoPixel stripClock object (REQUIRED)
+  stripDownlighter.show();            // Turn OFF all pixels ASAP
+  stripDownlighter.setBrightness(50); // Set BRIGHTNESS (max = 255)
+  
+}
+
+// Called when we're syncing the time for the first time
+// Useful for showing an animation on the display
+void timeSyncDisplayCallback(int totalDelay) {
+
+  int animationSteps = 50;
+
+  for (int i = 0; i < animationSteps; i++) {
+    delay(totalDelay / animationSteps);
+  }
+  
+}
+
 /*
- * Functions to draw each individual segment
- * These have to be separate functions because each segment draws a different part of the overall gradient
- * Do I regret the complexity?
- * Maybe.
- * 
+ * Function to draw each individual segment
  * Segments are as follows:
- * 
  *  
- *  -- 1 --
- * |       | 
+ *  <- 1 --
+ * |       ^ 
  * 2       0
- * |       |
- *   --3--
- * |       |
+ * v       |<-
+ *   --3->
+ * ^       |
  * 6       4
- * |       |
- *  -- 5 --
+ * |       v
+ *  <- 5 --
  * 
  */
 
@@ -53,19 +74,21 @@ void drawSegments(int offset, int segments[], unsigned int digitStartHue, unsign
     // then the start and end are reversed
     // The following are values out of (/9984), which is a 16-bit representation of
     // how much variation there is between the start and end of each digit
-    unsigned int startGradientMap[9] = {7680, 4864, 0,    2048, 7936, 9472, 3328};
-    unsigned int endGradientMap[9] =   {5888, 256,  1536, 7168, 9984, 3840, 1792};
+    unsigned int startSegmentGradientMap[7] = {7680, 4864, 0,    2048, 7936, 9472, 3328};
+    unsigned int endSegmentGradientMap[7] =   {5888, 256,  1536, 7168, 9984, 3840, 1792};
 
     // Loop over each pixel to be lit
     for (int i = 0; i < 9; i++) {
 
       // Percentage of how far through the gradient we are on this pixel relative
       // to the segment as a whole
-      float percentage = (float)map(i, 0, 8, startGradientMap[segment], endGradientMap[segment]) / (float)9984;
+      float percentage = (float)map(i, 0, 8, startSegmentGradientMap[segment], endSegmentGradientMap[segment]) / (float)9984;
 
+      // Convert the percentage into an absolute hue and saturation for this pixel
       unsigned int pixelHue =        (percentage * (digitEndHue - digitStartHue)) + digitStartHue;
       unsigned int pixelSaturation = (percentage * (digitEndSaturation - digitStartSaturation)) + digitStartSaturation;
-  
+
+      // Finally, add this pixel to the buffer to be rendered
       stripClock.setPixelColor(offset + i, stripClock.gamma32(stripClock.ColorHSV(pixelHue, pixelSaturation)));
       
     }
@@ -74,110 +97,77 @@ void drawSegments(int offset, int segments[], unsigned int digitStartHue, unsign
   
 }
 
-/*
- * 
- *  Functions for each possible value to display on the clock
- *  Not very elegant but it will do.
- *  
- *  Hopefully these should be self-explanatory
- * 
- */
 
 // Function to handle displaying each different digit
-void displayNumber(int valueToDisplay, int offsetBy, unsigned int digitStartHue, unsigned int digitEndHue, unsigned int digitStartSaturation, unsigned int digitEndSaturation) {
+void displayNumber(int valueToDisplay, int offset, unsigned int digitStartHue, unsigned int digitEndHue, unsigned int digitStartSaturation, unsigned int digitEndSaturation) {
 
   switch (valueToDisplay) {
 
-    // The curly braces allow us to declare the same segments[] variable multiple times, once in each case statement
-    // Unfortunately this means we also need the drawSegments() call to be in the variable scope, instead of once at the end
+    // The curly braces allow us to declare the same segments[] variable multiple
+    // times, once in each case statement. Unfortunately this means we also need
+    // the drawSegments() call to be in the variable scope, instead of once at the end
     case 0: {
       int segments[] = {0, 1, 2, 4, 5, 6};
-      drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
+      drawSegments(offset, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
       break;
     }
       
     case 1: {
       int segments[] = {0, 4};
-      drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
+      drawSegments(offset, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
       break;
     }
       
     case 2: {
       int segments[] = {1, 0, 3, 6, 5};
-      drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
+      drawSegments(offset, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
       break;
     }
       
     case 3: {
       int segments[] = {1, 0, 3, 4, 5};
-      drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
+      drawSegments(offset, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
       break;
     }
       
     case 4: {
       int segments[] = {2, 3, 0, 4};
-      drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
+      drawSegments(offset, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
       break;
     }
       
     case 5: {
       int segments[] = {1, 2, 3, 4, 5};
-      drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
+      drawSegments(offset, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
       break;
     }
       
     case 6: {
       int segments[] = {1, 2, 3, 4, 5, 6};
-      drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
+      drawSegments(offset, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
       break;
     }
       
     case 7: {
       int segments[] = {1, 0, 4};
-      drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
+      drawSegments(offset, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
       break;
     }
       
     case 8: {
       int segments[] = {0, 1, 2, 3, 4, 5, 6};
-      drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
+      drawSegments(offset, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
       break;
     }
       
     case 9: {
       int segments[] = {0, 1, 2, 3, 4, 5};
-      drawSegments(offsetBy, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
+      drawSegments(offset, segments, digitStartHue, digitEndHue, digitStartSaturation, digitStartSaturation);
       break;
     }
-     
-    }
 
   }
 
-}
-
-void setupDisplay() {
-
-  stripClock.begin();           // INITIALIZE NeoPixel stripClock object (REQUIRED)
-  stripClock.show();            // Turn OFF all pixels ASAP
-  stripClock.setBrightness(100); // Set inital BRIGHTNESS (max = 255)
-
-  stripDownlighter.begin();           // INITIALIZE NeoPixel stripClock object (REQUIRED)
-  stripDownlighter.show();            // Turn OFF all pixels ASAP
-  stripDownlighter.setBrightness(50); // Set BRIGHTNESS (max = 255)
-  
-}
-
-// Called when we're syncing the time for the first time
-// Useful for showing an animation on the display
-void timeSyncDisplayCallback(int totalDelay) {
-
-  int animationSteps = 50;
-
-  for (int i = 0; i < animationSteps; i++) {
-    delay(totalDelay / animationSteps);
-  }
-  
 }
 
 void displayDigitWithGradient(int digitID, int valueToDisplay, unsigned int startHue, unsigned int endHue, unsigned int startSaturation, unsigned int endSaturation) {
